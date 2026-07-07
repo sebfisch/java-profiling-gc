@@ -14,6 +14,7 @@ public final class Csv {
     private Csv() {}
 
     public static Transaction parse(String line) {
+        // D2: fresh Pattern, split array, boxed Long, throwaway formatter - churn on every line (T1.2)
         if (!line.matches("[A-Z]+-\\d+;-?\\d+;\\d{4}-\\d{2}-\\d{2}T[0-9:]+Z")) {
             throw new IllegalArgumentException("malformed line: " + line);
         }
