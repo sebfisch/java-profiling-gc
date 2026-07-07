@@ -1,7 +1,7 @@
 package sebfisch.statements;
 
 import java.time.Instant;
-import java.util.regex.Pattern;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Parses the CSV line format used by the transaction feed:
@@ -11,20 +11,16 @@ import java.util.regex.Pattern;
  */
 public final class Csv {
 
-    private static final Pattern VALID =
-            Pattern.compile("[A-Z]+-\\d+;-?\\d+;\\d{4}-\\d{2}-\\d{2}T[0-9:]+Z");
-
     private Csv() {}
 
     public static Transaction parse(String line) {
-        if (!VALID.matcher(line).matches()) {
+        if (!line.matches("[A-Z]+-\\d+;-?\\d+;\\d{4}-\\d{2}-\\d{2}T[0-9:]+Z")) {
             throw new IllegalArgumentException("malformed line: " + line);
         }
-        int first = line.indexOf(';');
-        int second = line.indexOf(';', first + 1);
-        String account = line.substring(0, first);
-        long cents = Long.parseLong(line, first + 1, second, 10);
-        Instant at = Instant.parse(line.substring(second + 1));
-        return new Transaction(account, cents, at);
+        String[] fields = line.split(";");
+        DateTimeFormatter timestamps = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+        Long cents = Long.valueOf(fields[1]);
+        Instant at = timestamps.parse(fields[2], Instant::from);
+        return new Transaction(fields[0], cents, at);
     }
 }
