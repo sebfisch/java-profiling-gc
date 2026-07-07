@@ -24,6 +24,7 @@ public final class AuditLog {
     }
 
     public synchronized void record(String event, String detail) {
+        // D4: expensive formatting inside the one lock every query funnels through (T1.4)
         DateTimeFormatter stamps =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneOffset.UTC);
         String entry = String.format("%s %-8s %s", stamps.format(Instant.now()), event, detail);
