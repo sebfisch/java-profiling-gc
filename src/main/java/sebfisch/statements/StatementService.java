@@ -4,19 +4,21 @@ import java.time.Instant;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SequencedMap;
 
 /**
  * Answers the two questions the statement service exists for: monthly
  * statements over an account's retained history (batch mode) and balance
  * reports at a point in time (serve mode). Balance reports are cached so
- * repeated queries are served without recomputation.
+ * repeated queries are served without recomputation; the cache is bounded,
+ * evicting the oldest entry once full.
  */
 public final class StatementService {
 
-    private static final Map<String, BalanceReport> REPORT_CACHE = new HashMap<>();
+    private static final int MAX_CACHED_REPORTS = 10_000;
+    private static final SequencedMap<String, BalanceReport> REPORT_CACHE = new LinkedHashMap<>();
 
     private final TransactionStore store;
 
@@ -64,7 +66,10 @@ public final class StatementService {
         }
         BalanceReport report = computeReport(account, asOf);
         synchronized (REPORT_CACHE) {
-            REPORT_CACHE.put(key, report);
+            REPORT_CACHE.putLast(key, report);
+            if (REPORT_CACHE.size() > MAX_CACHED_REPORTS) {
+                REPORT_CACHE.pollFirstEntry();
+            }
         }
         return report;
     }
