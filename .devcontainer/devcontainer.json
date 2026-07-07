@@ -1,0 +1,21 @@
+{
+  "name": "java-profiler-gc",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "mounts": ["type=tmpfs,destination=/tmp,tmpfs-mode=1777"],
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "25",
+      "jdkDistro": "tem",
+      "installMaven": "true"
+    }
+  },
+  "forwardPorts": [8849],
+  "portsAttributes": {
+    "8849": { "label": "JProfiler agent" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["vscjava.vscode-java-pack", "mhutchie.git-graph"]
+    }
+  }
+}
