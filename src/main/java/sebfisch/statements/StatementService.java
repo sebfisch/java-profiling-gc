@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public final class StatementService {
 
+    // D3: unbounded static cache; serve mode makes every key unique - a leak (T1.3)
     private static final Map<String, BalanceReport> REPORT_CACHE = new HashMap<>();
 
     private final TransactionStore store;

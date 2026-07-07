@@ -35,6 +35,7 @@ public final class TransactionStore {
     public synchronized boolean add(Transaction transaction) {
         List<Transaction> recent =
                 recentByAccount.computeIfAbsent(transaction.account(), _ -> new ArrayList<>());
+        // D1: linear scan per insert - ingestion is quadratic in account size (T1.1)
         if (recent.contains(transaction)) {
             return false;
         }
