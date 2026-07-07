@@ -16,6 +16,9 @@ public final class AuditLog {
     /** The shared audit log all service operations record to. */
     public static final AuditLog GLOBAL = new AuditLog(65_536);
 
+    private static final DateTimeFormatter STAMPS =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneOffset.UTC);
+
     private final String[] ring;
     private long count;
 
@@ -23,12 +26,12 @@ public final class AuditLog {
         this.ring = new String[capacity];
     }
 
-    public synchronized void record(String event, String detail) {
-        DateTimeFormatter stamps =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneOffset.UTC);
-        String entry = String.format("%s %-8s %s", stamps.format(Instant.now()), event, detail);
-        ring[(int) (count % ring.length)] = entry;
-        count++;
+    public void record(String event, String detail) {
+        String entry = String.format("%s %-8s %s", STAMPS.format(Instant.now()), event, detail);
+        synchronized (this) {
+            ring[(int) (count % ring.length)] = entry;
+            count++;
+        }
     }
 
     /** How many entries were ever recorded. */
