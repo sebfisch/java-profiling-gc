@@ -1,9 +1,10 @@
 package sebfisch.statements;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedSet;
 import java.util.Set;
 
 /**
@@ -19,7 +20,7 @@ import java.util.Set;
 public final class TransactionStore {
 
     private final int windowSize;
-    private final Map<String, List<Transaction>> recentByAccount = new HashMap<>();
+    private final Map<String, SequencedSet<Transaction>> recentByAccount = new HashMap<>();
     private final Map<String, Long> balances = new HashMap<>();
     private final Map<String, Long> transactionCounts = new HashMap<>();
 
@@ -33,12 +34,11 @@ public final class TransactionStore {
      * @return whether the transaction was new
      */
     public synchronized boolean add(Transaction transaction) {
-        List<Transaction> recent =
-                recentByAccount.computeIfAbsent(transaction.account(), _ -> new ArrayList<>());
-        if (recent.contains(transaction)) {
+        SequencedSet<Transaction> recent =
+                recentByAccount.computeIfAbsent(transaction.account(), _ -> new LinkedHashSet<>());
+        if (!recent.add(transaction)) {
             return false;
         }
-        recent.add(transaction);
         if (recent.size() > windowSize) {
             recent.removeFirst();
         }
@@ -63,12 +63,14 @@ public final class TransactionStore {
 
     /** How many recent transactions are retained in detail for the account. */
     public synchronized int recentCount(String account) {
-        return recentByAccount.getOrDefault(account, List.of()).size();
+        SequencedSet<Transaction> recent = recentByAccount.get(account);
+        return recent == null ? 0 : recent.size();
     }
 
     /** The retained transactions of the account, oldest first. */
     public synchronized List<Transaction> transactionsFor(String account) {
-        return List.copyOf(recentByAccount.getOrDefault(account, List.of()));
+        SequencedSet<Transaction> recent = recentByAccount.get(account);
+        return recent == null ? List.of() : List.copyOf(recent);
     }
 
     public synchronized Set<String> accounts() {
