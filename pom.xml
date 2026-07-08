@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>sebfisch.JavaProfilerGc</groupId>
-  <artifactId>java-profiler-gc</artifactId>
+  <groupId>sebfisch.JavaProfilingGc</groupId>
+  <artifactId>java-profiling-gc</artifactId>
   <version>0.1</version>
 
   <name>Java Profiling and Garbage Collection</name>
-  <url>https://sebfisch.github.io/java-profiler-gc/</url>
+  <url>https://sebfisch.github.io/java-profiling-gc/</url>
 
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
