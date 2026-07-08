@@ -13,7 +13,7 @@
   "portsAttributes": {
     "8849": { "label": "JProfiler agent" }
   },
-  "postCreateCommand": "bash .devcontainer/install-jprofiler-agent.sh",
+  "postCreateCommand": "git submodule update --init wiki; bash .devcontainer/install-jprofiler-agent.sh",
   "customizations": {
     "vscode": {
       "extensions": ["vscjava.vscode-java-pack", "mhutchie.git-graph"]

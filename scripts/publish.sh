@@ -1,0 +1,84 @@
+#!/bin/sh
+# Instructor tool: mint the learner-facing tags from the stage branches and
+# push everything. The tags are a publish-time artifact - during preparation
+# only the stages/* branches move (see sync-stages.sh).
+#
+# Usage: scripts/publish.sh [--verify]
+#   --verify   run `mvn -q test` at every stage before tagging (slow)
+#
+# One-time GitHub setup:
+#   1. create the GitHub repository and add it as `origin` of this repo
+#   2. enable the wiki and create any page once via the web UI - GitHub
+#      creates the <repo>.wiki.git repository only then
+#   3. git -C wiki remote add github git@github.com:<owner>/<repo>.wiki.git
+# After that every publish is just this script.
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$ROOT"
+
+die() { echo "$*" >&2; exit 1; }
+
+# tag=ref pairs, in stage order; seeded is simply the tip of main
+STAGES="seeded=main
+fixed-d1=stages/fixed-d1
+fixed-d2=stages/fixed-d2
+fixed-d3=stages/fixed-d3
+fixed-all=stages/fixed-all
+allocation-storm=stages/allocation-storm"
+
+git -C wiki diff-index --quiet HEAD -- \
+    || die "uncommitted changes in wiki/ - commit them there first"
+git diff-index --quiet HEAD -- ':!wiki' \
+    || die "working tree not clean - commit or stash first"
+
+# the submodule moved: record the new wiki pointer on main
+if ! git diff --quiet HEAD -- wiki; then
+    git add wiki
+    git commit -m "update wiki"
+fi
+
+# every stage and the instructor branch must sit on top of main
+for ref in $(printf '%s\n' "$STAGES" | cut -d= -f2 | tail -n +2) instructor; do
+    git merge-base --is-ancestor main "$ref" \
+        || die "$ref is not on top of main - run scripts/sync-stages.sh first"
+done
+# and the fix chain must be cumulative
+prev=main
+for ref in $(printf '%s\n' "$STAGES" | cut -d= -f2 | tail -n +2); do
+    git merge-base --is-ancestor "$prev" "$ref" \
+        || die "$ref does not contain $prev - the stage chain is broken"
+    prev=$ref
+done
+
+if [ "${1:-}" = --verify ]; then
+    for pair in $STAGES; do
+        ref=${pair#*=}
+        echo "verify: mvn test at $ref"
+        tree=$(mktemp -d)
+        git worktree add -q --detach "$tree" "$ref"
+        (cd "$tree" && mvn -q test) || die "tests fail at $ref"
+        git worktree remove "$tree"
+    done
+fi
+
+for pair in $STAGES; do
+    git tag -f "${pair%%=*}" "${pair#*=}"
+done
+echo "tags updated:"
+git tag -n --sort=creatordate
+
+if git remote get-url origin >/dev/null 2>&1; then
+    git push origin main instructor
+    git push --force origin $(printf '%s\n' "$STAGES" | cut -d= -f1 | sed 's|^|refs/tags/|')
+else
+    echo "no origin remote - skipped pushing the main repo"
+fi
+
+# prefer the GitHub wiki remote once configured, else the local sibling repo
+if git -C wiki remote get-url github >/dev/null 2>&1; then
+    git -C wiki push -f github master
+else
+    git -C wiki push origin master
+    echo "wiki pushed to the local sibling repo only (no 'github' remote yet)"
+fi

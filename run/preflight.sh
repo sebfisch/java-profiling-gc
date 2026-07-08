@@ -33,6 +33,14 @@ probe ZGC -XX:+UseZGC
 probe Shenandoah -XX:+UseShenandoahGC
 probe Epsilon -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
 
+# The course material lives in the wiki submodule.
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ -f "$ROOT/wiki/Home.md" ]; then
+    echo "wiki:        go"
+else
+    echo "wiki:        NO-GO (run 'git submodule update --init')"
+fi
+
 # Informational only - the exercises don't require JProfiler.
 if [ -f /opt/jprofiler-agent/libjprofilerti.so ]; then
     echo "JProfiler:   agent staged (run any script with JPROFILER=1 to load it)"
