@@ -32,3 +32,10 @@ probe G1 -XX:+UseG1GC
 probe ZGC -XX:+UseZGC
 probe Shenandoah -XX:+UseShenandoahGC
 probe Epsilon -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
+
+# Informational only - the exercises don't require JProfiler.
+if [ -f /opt/jprofiler-agent/libjprofilerti.so ]; then
+    echo "JProfiler:   agent staged (run any script with JPROFILER=1 to load it)"
+else
+    echo "JProfiler:   agent not staged (optional; see .devcontainer/jprofiler-vendor/README.md)"
+fi

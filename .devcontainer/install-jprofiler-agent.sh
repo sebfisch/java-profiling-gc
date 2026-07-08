@@ -20,14 +20,30 @@ if [ ! -d "$VENDOR_DIR" ]; then
   exit 0
 fi
 
+# The tarball ships the agent for every platform under bin/linux-<arch>/;
+# prefer the one matching this container, fall back to the first found
+# (covers a bare libjprofilerti.so dropped directly into the vendor dir).
+case "$(uname -m)" in
+  x86_64) ARCH_DIR=linux-x64 ;;
+  aarch64) ARCH_DIR=linux-aarch64 ;;
+  *) ARCH_DIR="" ;;
+esac
+
 find_agent_so() {
-  find "$1" -name libjprofilerti.so -print -quit 2>/dev/null
+  local match=""
+  if [ -n "$ARCH_DIR" ]; then
+    match="$(find "$1" -path "*/$ARCH_DIR/libjprofilerti.so" -print -quit 2>/dev/null)"
+  fi
+  if [ -z "$match" ]; then
+    match="$(find "$1" -name libjprofilerti.so -print -quit 2>/dev/null)"
+  fi
+  printf '%s\n' "$match"
 }
 
 so_path="$(find_agent_so "$VENDOR_DIR")"
 
 if [ -z "$so_path" ]; then
-  tarball="$(find "$VENDOR_DIR" -maxdepth 1 -name 'jprofiler_linux_*.tar.gz' -print -quit 2>/dev/null)"
+  tarball="$(find "$VENDOR_DIR" -maxdepth 1 -name 'jprofiler_linux*.tar.gz' -print -quit 2>/dev/null)"
   if [ -n "$tarball" ]; then
     echo "Extracting $tarball ..."
     extract_dir="$VENDOR_DIR/.extracted"
@@ -43,6 +59,15 @@ if [ -z "$so_path" ]; then
 fi
 
 sudo mkdir -p "$INSTALL_DIR"
-sudo cp "$so_path" "$TARGET_SO"
+if [ -f "$(dirname "$so_path")/../agent.jar" ]; then
+  # The agent locates sibling files from its install tree via the library's
+  # real path (bin/agent.jar etc.) and aborts without them, so link into the
+  # extracted tree instead of copying the bare library.
+  sudo ln -sf "$so_path" "$TARGET_SO"
+else
+  sudo cp "$so_path" "$TARGET_SO"
+  echo "Warning: no agent.jar next to the library; recent JProfiler versions" >&2
+  echo "need their full install tree — prefer dropping the tarball instead." >&2
+fi
 echo "Staged JProfiler agent at $TARGET_SO"
 echo "Use: -agentpath:$TARGET_SO=port=8849"
