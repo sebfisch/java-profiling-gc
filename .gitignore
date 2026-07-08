@@ -1,5 +1,6 @@
 target
-logs
+logs/*
+!logs/.gitkeep
 *~
 .devcontainer/devcontainer-lock.json
 .devcontainer/instructor/
