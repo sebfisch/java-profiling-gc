@@ -1,0 +1,4 @@
+[submodule "wiki"]
+	path = wiki
+	url = ../java-profiling-gc.wiki.git
+	branch = master
