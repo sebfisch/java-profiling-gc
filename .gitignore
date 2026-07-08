@@ -2,5 +2,6 @@ target
 logs
 *~
 .devcontainer/devcontainer-lock.json
+.devcontainer/instructor/
 .devcontainer/jprofiler-vendor/*
 !.devcontainer/jprofiler-vendor/README.md
