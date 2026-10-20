@@ -72,7 +72,10 @@ echo "tags updated:"
 git tag -n --sort=creatordate
 
 if git remote get-url origin >/dev/null 2>&1; then
-    git push origin main instructor
+    git push origin main
+    # sync-stages.sh rebases instructor onto main, so it never fast-forwards;
+    # the lease refuses to overwrite anything pushed from elsewhere
+    git push --force-with-lease origin instructor
     git push --force origin $(printf '%s\n' "$STAGES" | cut -d= -f1 | sed 's|^|refs/tags/|')
 else
     echo "no origin remote - skipped pushing the main repo"
