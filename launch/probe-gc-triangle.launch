@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-profiling-gc"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sebfisch.probes.GcTriangle"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseG1GC -Xmx2g -Xlog:gc*:file=logs/probe-gc-triangle.log"/>
+    <!-- Collector: keep exactly one VM_ARGUMENTS line outside this comment.
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseSerialGC -Xmx2g -Xlog:gc*:file=logs/probe-gc-triangle.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseParallelGC -Xmx2g -Xlog:gc*:file=logs/probe-gc-triangle.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseZGC -Xmx2g -Xlog:gc*:file=logs/probe-gc-triangle.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseShenandoahGC -Xmx2g -Xlog:gc*:file=logs/probe-gc-triangle.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC -Xmx2g -Xlog:gc*:file=logs/probe-gc-triangle.log"/>
+    -->
+</launchConfiguration>

@@ -3,4 +3,11 @@
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-profiling-gc"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sebfisch.probes.MemoryLeak"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseG1GC -Xmx256m -Xlog:gc*:file=logs/probe-leak.log"/>
+    <!-- Collector: keep exactly one VM_ARGUMENTS line outside this comment.
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseSerialGC -Xmx256m -Xlog:gc*:file=logs/probe-leak.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseParallelGC -Xmx256m -Xlog:gc*:file=logs/probe-leak.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseZGC -Xmx256m -Xlog:gc*:file=logs/probe-leak.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseShenandoahGC -Xmx256m -Xlog:gc*:file=logs/probe-leak.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC -Xmx256m -Xlog:gc*:file=logs/probe-leak.log"/>
+    -->
 </launchConfiguration>

@@ -3,4 +3,11 @@
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-profiling-gc"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sebfisch.probes.CpuHotspot"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseG1GC -Xmx1g -Xlog:gc*:file=logs/probe-hotspot.log"/>
+    <!-- Collector: keep exactly one VM_ARGUMENTS line outside this comment.
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseSerialGC -Xmx1g -Xlog:gc*:file=logs/probe-hotspot.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseParallelGC -Xmx1g -Xlog:gc*:file=logs/probe-hotspot.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseZGC -Xmx1g -Xlog:gc*:file=logs/probe-hotspot.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseShenandoahGC -Xmx1g -Xlog:gc*:file=logs/probe-hotspot.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC -Xmx1g -Xlog:gc*:file=logs/probe-hotspot.log"/>
+    -->
 </launchConfiguration>

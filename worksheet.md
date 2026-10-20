@@ -16,7 +16,7 @@ Guilty frame (written down *before* looking at the source):
 
 | | batch throughput (tx/s) |
 |---|---|
-| seeded | |
+| before fix | |
 | after fix | |
 
 Speedup: ____×
@@ -27,7 +27,7 @@ Top allocation hot spot: ____________________________________________
 
 | | GC collections during run | total GC pause time |
 |---|---|---|
-| seeded | | |
+| before fix | | |
 | after fix | | |
 
 Keep these numbers — T2.3 reuses them.
@@ -44,7 +44,7 @@ Heap curve after the fix (sketch or describe): ____________________
 
 ### T1.4 — the contention (stretch)
 
-| workers | queries/s (seeded) | queries/s (after fix) |
+| workers | queries/s (before fix) | queries/s (after fix) |
 |---|---|---|
 | 4 | | |
 | 16 | | |
@@ -99,8 +99,10 @@ churn, or switching collectors?
 
 ### T2.4 — Epsilon as an instrument (stretch)
 
-Heap consumed: ______ MB over ______ s → allocation rate ______ MB/s
+| | Epsilon: heap used at the end (MB) | JProfiler: total allocated (MB) |
+|---|---|---|
+| `fixed-all` | | |
+| `allocation-storm` | | |
+| storm ÷ fixed | ____× | ____× |
 
-JProfiler's allocation telemetry from T1.2 said: ______ MB/s
-
-Do the two instruments agree (roughly)? ____
+Do the two instruments agree on the ratio (roughly)? ____
