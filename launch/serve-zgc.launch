@@ -3,4 +3,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-profiling-gc"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sebfisch.statements.ServeMain"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseZGC -Xmx1g -Xlog:gc*:file=logs/serve-zgc.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="8 20 5000 100000"/>
 </launchConfiguration>

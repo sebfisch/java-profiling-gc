@@ -3,4 +3,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-profiling-gc"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sebfisch.statements.BatchMain"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-XX:+UseG1GC -Xmx1g -Xlog:gc*:file=logs/batch-g1.log"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="100 20000"/>
 </launchConfiguration>

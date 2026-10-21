@@ -1,7 +1,14 @@
 # Eclipse launch configurations
 
 One launch configuration per script in [run/](../run), with the same JVM
-flags, program arguments, and GC log destination (`logs/<name>.log`).
+flags and GC log destination (`logs/<name>.log`). The batch and serve
+configurations also carry the program arguments that the GC exercises pass
+to the scripts on the command line, so a plain *Run* measures the exercise
+workload.
+
+`gc-pauses.launch` runs on the selected resource: select a GC log in the
+Project Explorer (or click into its editor), then run it to print the pause
+count, total and maximum per kind of pause - like `run/gc-pauses.sh`.
 Import the project into Eclipse (File > Import > Existing Maven Projects)
 and they appear under *Run > Run Configurations > Java Application*.
 

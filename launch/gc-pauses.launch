@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="java-profiling-gc"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sebfisch.tools.GcPauses"/>
+    <!-- Select a GC log in the Project Explorer (or open it in an editor) before running. -->
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="${resource_loc}"/>
+</launchConfiguration>
