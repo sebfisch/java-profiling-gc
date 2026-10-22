@@ -42,7 +42,7 @@ GC root that keeps it alive: ____________________________________________
 
 Heap curve after the fix (sketch or describe): ____________________
 
-### T1.4 — the contention (stretch)
+### T1.4 — the contention
 
 | workers | queries/s (before fix) | queries/s (after fix) |
 |---|---|---|
@@ -97,7 +97,7 @@ churn, or switching collectors?
     ____________________________________________
     ____________________________________________
 
-### T2.4 — Epsilon as an instrument (stretch)
+### T2.4 — Epsilon as an instrument
 
 | | Epsilon: heap used at the end (MB) | JProfiler: total allocated (MB) |
 |---|---|---|
