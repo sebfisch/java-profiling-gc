@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import org.junit.jupiter.api.Test;
 import sebfisch.tools.GcPauses.Pause;
+import sebfisch.tools.GcPauses.Stall;
 
 class GcPausesTests {
 
@@ -54,6 +55,24 @@ class GcPausesTests {
                 "[10.0s][info][gc,stats    ]       Young Pause: Pause Mark Start"
                         + "      0.020 / 0.023         0.020 / 0.023       ms")) {
             assertTrue(GcPauses.parse(line).isEmpty(), line);
+        }
+    }
+
+    @Test
+    void parsesZgcAllocationStalls() {
+        assertEquals(
+                Optional.of(new Stall("worker-6", 13.655)),
+                GcPauses.parseStall("[1.336s][info][gc          ] Allocation Stall (worker-6) 13.655ms"));
+        assertTrue(GcPauses.parse("[1.336s][info][gc          ] Allocation Stall (worker-6) 13.655ms").isEmpty());
+    }
+
+    @Test
+    void ignoresLinesThatAreNotStalls() {
+        for (String line : List.of(
+                "[0.347s][info][gc,alloc    ] GC(0) Y: Allocation Stalls:          0                0"
+                        + "                0                0         ",
+                "[2.312s][info][gc] GC(17) Pause Young (Normal) (G1 Evacuation Pause) 87M->23M(1024M) 3.402ms")) {
+            assertTrue(GcPauses.parseStall(line).isEmpty(), line);
         }
     }
 }

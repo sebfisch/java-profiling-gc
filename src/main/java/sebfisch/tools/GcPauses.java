@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,13 @@ import java.util.stream.Stream;
  * is what sizing the heap has to leave room for. ZGC and Shenandoah log no
  * sizes on their pause lines, so their pauses show none.
  *
+ * <p>ZGC also logs allocation stalls: a thread that allocates faster than the
+ * concurrent collector reclaims waits until memory is free, one line per
+ * stall. A stall stops only the thread that allocates, a pause stops all of
+ * them, so stalls are summed apart from the pauses, per thread, most stalled
+ * first, and for all threads. Stall times of different threads overlap;
+ * their total can exceed the run time.
+ *
  * <p>Usage: {@code GcPauses logFile...}
  */
 public final class GcPauses {
@@ -40,6 +48,10 @@ public final class GcPauses {
     // [0.512s][info][gc,phases] GC(3) y: Pause Mark Start 0.010ms
     private static final Pattern PAUSE = Pattern.compile(
             "\\] (?:GC\\(\\d+\\) )?((?:\\w: )?Pause.*?)(?: \\d+[BKMG]->(\\d+)([BKMG])\\(\\d+[BKMG]\\))? (\\d+(?:\\.\\d+)?)ms$");
+
+    // [1.336s][info][gc] Allocation Stall (worker-6) 13.655ms
+    private static final Pattern STALL = Pattern.compile(
+            "\\] Allocation Stall \\((.+)\\) (\\d+(?:\\.\\d+)?)ms$");
 
     private GcPauses() {}
 
@@ -76,6 +88,18 @@ public final class GcPauses {
                 heapAfterMb));
     }
 
+    /** One allocation stall: the thread that waited, and how long. */
+    record Stall(String thread, double millis) {}
+
+    /** The allocation stall a log line reports, or empty if it reports none. */
+    static Optional<Stall> parseStall(String line) {
+        Matcher matcher = STALL.matcher(line);
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Stall(matcher.group(1), Double.parseDouble(matcher.group(2))));
+    }
+
     private static double megabytes(long size, String unit) {
         return switch (unit) {
             case "B" -> size / (1024.0 * 1024.0);
@@ -88,20 +112,52 @@ public final class GcPauses {
     private static void summarize(Path log) throws IOException {
         Map<String, Total> byKind = new LinkedHashMap<>();
         Total all = new Total();
+        Map<String, StallTotal> byThread = new LinkedHashMap<>();
+        StallTotal allStalls = new StallTotal();
         try (Stream<String> lines = Files.lines(log)) {
-            lines.map(GcPauses::parse).flatMap(Optional::stream).forEach(pause -> {
-                byKind.computeIfAbsent(pause.kind(), _ -> new Total()).add(pause);
-                all.add(pause);
+            lines.forEach(line -> {
+                parse(line).ifPresent(pause -> {
+                    byKind.computeIfAbsent(pause.kind(), _ -> new Total()).add(pause);
+                    all.add(pause);
+                });
+                parseStall(line).ifPresent(stall -> {
+                    byThread.computeIfAbsent(stall.thread(), _ -> new StallTotal()).add(stall);
+                    allStalls.add(stall);
+                });
             });
         }
         IO.println(log);
         if (all.count == 0) {
             IO.println("  no pauses logged");
-            return;
+        } else {
+            IO.println("  %7s  %12s  %10s  %10s  %s".formatted("pauses", "total", "max", "heap after", "kind"));
+            byKind.forEach((kind, total) -> IO.println(total.row(kind)));
+            IO.println(all.row("all pauses"));
         }
-        IO.println("  %7s  %12s  %10s  %10s  %s".formatted("pauses", "total", "max", "heap after", "kind"));
-        byKind.forEach((kind, total) -> IO.println(total.row(kind)));
-        IO.println(all.row("all pauses"));
+        if (allStalls.count > 0) {
+            IO.println("  %7s  %12s  %10s  %s".formatted("stalls", "total", "max", "thread"));
+            byThread.entrySet().stream()
+                    .sorted(Comparator.comparingDouble((Map.Entry<String, StallTotal> e) -> e.getValue().millis)
+                            .reversed())
+                    .forEach(e -> IO.println(e.getValue().row(e.getKey())));
+            IO.println(allStalls.row("all threads"));
+        }
+    }
+
+    private static final class StallTotal {
+        private long count;
+        private double millis;
+        private double max;
+
+        void add(Stall stall) {
+            count++;
+            millis += stall.millis();
+            max = Math.max(max, stall.millis());
+        }
+
+        String row(String thread) {
+            return "  %7d  %9.3f ms  %7.3f ms  %s".formatted(count, millis, max, thread);
+        }
     }
 
     private static final class Total {

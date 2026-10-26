@@ -6,10 +6,10 @@
 # GcTriangle's (300 MB, 20 s, half the cores)
 . "$(dirname -- "$0")/common.sh"
 # Collector: keep exactly one GC= line uncommented.
-GC=-XX:+UseG1GC
+# GC=-XX:+UseG1GC
 # GC=-XX:+UseSerialGC
 # GC=-XX:+UseParallelGC
-# GC=-XX:+UseZGC
+GC=-XX:+UseZGC
 # GC=-XX:+UseShenandoahGC
 # GC="-XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC"
 # GC is a flag list, split on purpose
